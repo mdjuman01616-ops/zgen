@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Telegram Clone with Auto Ads</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #f5f5f5;
+        }
+
+        .app-container {
+            max-width: 480px;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            position: relative;
+            background: linear-gradient(to bottom, #dbe9d5, #b8d2b0, #9fbf94);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" opacity="0.06"><path d="M10 20v-10h10v10zm20 20v-10h10v10z" fill="%23000"/></svg>');
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Header */
+        .header {
+            background-color: #ffffff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #517da2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            margin-left: 8px;
+        }
+
+        .user-info {
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .user-status {
+            font-size: 13px;
+            color: #707579;
+        }
+
+        /* Chat Body */
+        .chat-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            position: relative;
+        }
+
+        .empty-state-box {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 24px 20px;
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .empty-state-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-desc {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .seal-animation {
+            width: 85px;
+            height: 85px;
+            margin: 0 auto;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Input Bar */
+        .input-bar {
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 24px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .input-field {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 0 10px;
+        }
+
+        /* Popunder Overlay (96% Ads + 4% Timer) */
+        #popunder-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+            background-color: #000;
+            display: none;
+            flex-direction: column;
+        }
+
+        #ad-timer-bar {
+            height: 4%;
+            width: 100%;
+            background-color: #111;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        #ad-frame-container {
+            height: 96%;
+            width: 100%;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="back-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4f5b66" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </div>
+            <div class="user-avatar">A</div>
+            <div class="user-info">
+                <div class="user-name">A 🤍🤍</div>
+                <div class="user-status">last seen Jun 12 at 8:28 PM</div>
+            </div>
+        </div>
+
+        <!-- Chat Body -->
+        <div class="chat-body">
+            <!-- Native Banner Space -->
+            <div style="position: absolute; top: 10px; width: 100%; text-align: center; z-index: 5;">
+                <div id="container-0823abba30cba93d66684de7608d05f5"></div>
+                <script async="async" data-cfasync="false" src="https://pl29488329.effectivecpmnetwork.com/0823abba30cba93d66684de7608d05f5/invoke.js"></script>
+            </div>
+
+            <div class="empty-state-box">
+                <div class="empty-state-title">No messages here yet...</div>
+                <div class="empty-state-desc">Send a message or tap the greeting below.</div>
+                <div class="seal-animation">
+                    <svg viewBox="0 0 100 100" width="100%" height="100%">
+                        <g transform="translate(42, 5) scale(0.9)"><path d="M10 25 Q13 12 16 25 Q19 10 21 25 Q24 12 26 25 Q28 15 29 27 C31 35 25 45 15 45 C5 45 2 35 10 25 Z" fill="#ffa726"/></g>
+                        <path d="M25 85 C25 60 40 45 55 45 C70 45 80 60 75 80 C73 85 85 90 80 95 C65 95 35 95 25 85 Z" fill="#78909c"/>
+                        <circle cx="48" cy="58" r="5" fill="#fff"/><circle cx="49" cy="58" r="2.5" fill="#000"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="input-bar">
+            <div class="input-wrapper">
+                <input type="text" class="input-field" placeholder="Message">
+            </div>
+        </div>
+
+        <!-- Popunder Container UI -->
+        <div id="popunder-overlay">
+            <div id="ad-timer-bar">
+                <span>Sponsored Ad</span>
+                <span id="timer-text">Closing in 30s</span>
+            </div>
+            <div id="ad-frame-container">
+                <!-- Adsterra scripts logic dynamically loads here -->
+            </div>
+        </div>
+
+        <!-- 160x600 Banner Inside Code Structure -->
+        <script>
+          atOptions = {
+            'key' : '98730588b7aac1526550407361196d45',
+            'format' : 'iframe',
+            'height' : 600,
+            'width' : 160,
+            'params' : {}
+          };
+        </script>
+        <script src="https://www.highperformanceformat.com/98730588b7aac1526550407361196d45/invoke.js"></script>
+
+        <!-- Social Bar Script -->
+        <script src="https://pl29294836.effectivecpmnetwork.com/2e/5f/e8/2e5fe89c7bab0936e4c11206b9cde0d4.js"></script>
+    </div>
+
+    <!-- 30-Second Refresh & Auto Start Logic -->
+    <script>
+        const overlay = document.getElementById('popunder-overlay');
+        const timerText = document.getElementById('timer-text');
+        const adContainer = document.getElementById('ad-frame-container');
+        
+        // Adsterra Popunder Script link
+        const adScriptUrl = "https://pl29294835.effectivecpmnetwork.com/55/c9/eb/55c9ebfcf971434c8c76bf91e673184d.js";
+
+        function startAdCycle() {
+            // ঠিক ৩০ সেকেন্ড (৩০০০০ মিলিসেকেন্ড) পর পর অ্যাড লোড হবে
+            setTimeout(() => {
+                showPopunderAd();
+            }, 30000);
+        }
+
+        function showPopunderAd() {
+            // আইফ্রেম রিফ্রেশ করে অ্যাড স্ক্রিপ্ট নতুন করে জেনারেট করা হচ্ছে
+            adContainer.innerHTML = `<iframe src="${adScriptUrl}" style="width:100%; height:100%; background:#000; border:none;"></iframe>`;
+            overlay.style.display = 'flex';
+            
+            let timeLeft = 30;
+            timerText.innerText = `Closing in ${timeLeft}s`;
+
+            const countdown = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    overlay.style.display = 'none';
+                    adContainer.innerHTML = ''; // আগের অ্যাড রিমুভ
+                    
+                    // অ্যাড বন্ধ হওয়ার সাথে সাথে পরবর্তী ৩০ সেকেন্ডের সাইকেল আবার অটো স্টার্ট হবে
+                    startAdCycle(); 
+                } else {
+                    timerText.innerText = `Closing in ${timeLeft}s`;
+                }
+            }, 1000);
+        }
+
+        // অ্যাপটি ওপেন হওয়ামাত্রই প্রথম অটো সাইকেল ব্যাকগ্রাউন্ডে রান হয়ে যাবে
+        window.addEventListener('DOMContentLoaded', () => {
+            startAdCycle();
+        });
+    </script>
+</body>
+</html>
+
